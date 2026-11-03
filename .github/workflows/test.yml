@@ -1,0 +1,52 @@
+name: Check the YAML of next maintenance date
+
+on:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # to comment on the PR
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Validate maintenance.yaml
+        id: validate
+        run: |
+          if ! yq -o=json '.' maintenance.yaml > maintenance.json 2> yq-error.txt; then
+            {
+              echo '## 🛠️ Prochaine maintenance'
+              echo
+              echo '❌ `maintenance.yaml` n'"'"'est pas un YAML valide :'
+              echo
+              echo '```'
+              cat yq-error.txt
+              echo '```'
+            } > comment.md
+            cat comment.md
+            exit 1
+          fi
+          node .github/scripts/check-maintenance.mjs maintenance.json comment.md
+
+      - name: Comment the PR
+        if: always() && hashFiles('comment.md') != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- next-maintenance-check -->';
+            const body = `${marker}\n${fs.readFileSync('comment.md', 'utf8')}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            // Update the previous comment instead of piling up new ones
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const previous = comments.find((c) => c.user.type === 'Bot' && c.body.startsWith(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
