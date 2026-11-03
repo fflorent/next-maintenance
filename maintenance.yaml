@@ -5,9 +5,11 @@ common: &common
   durationMinutes: 30
   completeInterruption: true
 
-anct: *common
+anct:
+  <<: *common
   startDate: 2026-11-05T12:00:01 # sec 1 is a dirty trick to invalidate the localStorage agreement
   completeInterruption: false
 
 dinum: *common
+
 preprod: *common
