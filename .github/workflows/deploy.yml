@@ -19,9 +19,9 @@ jobs:
         id: build
         run: |
           mkdir -p _site
-          yq -o=json '.anct' < maintenance.yaml > _site/maintenance-anct.json
-          yq -o=json '.dinum' < maintenance.yaml > _site/maintenance-dinum.json
-          yq -o=json '.preprod' < maintenance.yaml > _site/maintenance-preprod.json
+          yq -o=json --yaml-fix-merge-anchor-to-spec=true '.anct' < maintenance.yaml > _site/maintenance-anct.json
+          yq -o=json --yaml-fix-merge-anchor-to-spec=true '.dinum' < maintenance.yaml > _site/maintenance-dinum.json
+          yq -o=json --yaml-fix-merge-anchor-to-spec=true '.preprod' < maintenance.yaml > _site/maintenance-preprod.json
 
       - name: Upload static files as artifact
         id: deployment

@@ -16,7 +16,7 @@ jobs:
       - name: Validate maintenance.yaml
         id: validate
         run: |
-          if ! yq -o=json '.' maintenance.yaml > maintenance.json 2> yq-error.txt; then
+          if ! yq -o=json --yaml-fix-merge-anchor-to-spec=true '.' maintenance.yaml > maintenance.json 2> yq-error.txt; then
             {
               echo '## 🛠️ Prochaine maintenance'
               echo
