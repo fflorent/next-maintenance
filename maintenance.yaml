@@ -1,0 +1,10 @@
+common: &common
+  # CEST = heure d'été (+0200), CET = heure d'hiver (+0100).
+  tz: CET
+  startDate: 2026-11-04T19:00:01 # sec 1 is a dirty trick to invalidate the localStorage agreement
+  durationMinutes: 30
+  completeInterruption: true
+
+anct: *common
+dinum: *common
+preprod: *common
